@@ -1,18 +1,18 @@
 import requests
 
+url = "https://bike-rental-pred.onrender.com/predict"
+
 data = {
-    "season": 3,
+    "season": 1,
     "holiday": 0,
-    "weekday": 2,
+    "weekday": 3,
     "workingday": 1,
-    "weathersit": 1,
+    "weathersit": 2,
     "temp": 0.5,
     "hum": 0.6,
-    "windspeed": 0.1,
-    "year": 2012,
-    "month": 8
+    "windspeed": 0.15,
+    "year": 1,
+    "month": 7
 }
 
-url = "http://127.0.0.1:5000/predict"
-response = requests.post(url, json=data)
-print(response.json())
+print(requests.post(url, json=data).json())
