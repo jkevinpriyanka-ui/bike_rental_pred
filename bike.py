@@ -35,9 +35,15 @@ def predict():
 
         df_model = df[model_features]
 
-        # Scaling
-        scaled_array = scaler.transform(df_model)
-        df_scaled = pd.DataFrame(scaled_array, columns=model_features)
+        # Columns scaled during training
+        num_cols_final = [
+            'temp','hum','windspeed','windspeed_log','year','month',
+            'month_sin','month_cos','temp_wind','summer_workingday'
+        ]
+
+        # Scale  numeric columns
+        df_model[num_cols_final] = scaler.transform(df_model[num_cols_final])
+
 
         # Prediction
         prediction = float(model.predict(df_scaled)[0])
