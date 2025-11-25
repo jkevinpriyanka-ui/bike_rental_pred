@@ -46,7 +46,7 @@ def predict():
 
 
         # Prediction
-        prediction = float(model.predict(df_scaled)[0])
+        prediction = float(model.predict(df_model)[0])
 
         return jsonify({
             "input": data,
