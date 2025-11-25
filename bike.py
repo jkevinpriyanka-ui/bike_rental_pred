@@ -1,4 +1,4 @@
-from flask import Flask, request, jsonify
+from flask import Flask, request, jsonify,send_from_directory
 import joblib
 import numpy as np
 import pandas as pd
@@ -11,6 +11,10 @@ app = Flask(__name__)
 @app.route('/')
 def home():
     return {"message": "Bike Rental Prediction API is running"}
+
+@app.route('/')
+def homepage():
+    return send_from_directory('static', 'bike_web.html')
 
 @app.route('/predict', methods=['POST'])
 def predict():

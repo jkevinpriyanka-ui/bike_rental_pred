@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Bike Rental Predictor</title>
+    <style>
+        body { font-family: Arial; margin: 30px; background: #f0f0f0; }
+        .container { background: white; padding: 20px; max-width: 500px; margin: auto; border-radius: 10px; }
+        input, select { width: 100%; padding: 10px; margin: 8px 0; }
+        button { width: 100%; padding: 12px; background: blue; color: white; border: none; border-radius: 5px; }
+        button:hover { background: darkblue; }
+        #result { margin-top: 15px; font-size: 20px; font-weight: bold; }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h2>Bike Rental Prediction</h2>
+
+    <label>Season</label>
+    <input id="season" type="number" min="1" max="4">
+
+    <label>Holiday (0 = No, 1 = Yes)</label>
+    <input id="holiday" type="number" min="0" max="1">
+
+    <label>Weekday (0=Mon … 6=Sun)</label>
+    <input id="weekday" type="number" min="0" max="6">
+
+    <label>Workingday (0/1)</label>
+    <input id="workingday" type="number" min="0" max="1">
+
+    <label>Weather Situation</label>
+    <input id="weathersit" type="number" min="1" max="4">
+
+    <label>Temperature (0–1)</label>
+    <input id="temp" type="number" step="0.01">
+
+    <label>Humidity (0–1)</label>
+    <input id="hum" type="number" step="0.01">
+
+    <label>Windspeed (0–1)</label>
+    <input id="windspeed" type="number" step="0.01">
+
+    <label>Year (0 or 1)</label>
+    <input id="year" type="number">
+
+    <label>Month (1-12)</label>
+    <input id="month" type="number" min="1" max="12">
+
+    <button onclick="predict()">Predict Rentals</button>
+
+    <div id="result"></div>
+</div>
+
+<script>
+async function predict() {
+    let data = {
+        season: Number(document.getElementById("season").value),
+        holiday: Number(document.getElementById("holiday").value),
+        weekday: Number(document.getElementById("weekday").value),
+        workingday: Number(document.getElementById("workingday").value),
+        weathersit: Number(document.getElementById("weathersit").value),
+        temp: Number(document.getElementById("temp").value),
+        hum: Number(document.getElementById("hum").value),
+        windspeed: Number(document.getElementById("windspeed").value),
+        year: Number(document.getElementById("year").value),
+        month: Number(document.getElementById("month").value)
+    };
+
+    const response = await fetch("/predict", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(data)
+    });
+
+    const result = await response.json();
+    document.getElementById("result").innerHTML = "Predicted Rentals: " + result.prediction_cnt;
+}
+</script>
+
+</body>
+</html>
