@@ -3,52 +3,52 @@ import joblib
 import numpy as np
 import pandas as pd
 
-# ---------------------------
-# Load Saved Objects
-# ---------------------------
-model = joblib.load("model/final_bike_model.pkl")          # stacked model
-top_features = joblib.load("model/top_features_avg.joblib") # top 10 features
-scaler = joblib.load("model/scaler.pkl")                    # scaler
+model = joblib.load("model/final_bike_model.pkl")  # stacked model
+scaler = joblib.load("model/scaler.pkl")           # scaler
 
 app = Flask(__name__)
 
-# ---------------------------
-# Home Route
-# ---------------------------
 @app.route('/')
 def home():
     return {"message": "Bike Rental Prediction API is running"}
 
-# ---------------------------
-# Predict Route
-# ---------------------------
 @app.route('/predict', methods=['POST'])
 def predict():
     try:
         data = request.get_json()
-
-        # Convert to DataFrame
         df = pd.DataFrame([data])
 
-        # Select only the top features (you saved earlier)
-        df = df[top_features]
+        # Feature Engineering
+        df['windspeed_log'] = np.log1p(df['windspeed'])
+        df['is_weekend'] = (df['weekday'] >= 5).astype(int)
+        df['month_sin'] = np.sin(2 * np.pi * df['month'] / 12)
+        df['month_cos'] = np.cos(2 * np.pi * df['month'] / 12)
+        df['temp_wind'] = df['temp'] * df['windspeed']
+        df['summer_workingday'] = ((df['season'] == 3) & (df['workingday'] == 1)).astype(int)
 
-        # Scale numerical input
-        df_scaled = scaler.transform(df)
+        # Define model features
+        model_features = [
+            'season', 'holiday', 'weekday', 'workingday', 'weathersit',
+            'temp', 'hum', 'windspeed', 'windspeed_log', 'year', 'month',
+            'is_weekend', 'month_sin', 'month_cos', 'temp_wind', 'summer_workingday'
+        ]
 
-        # Predict using the final stacked model
-        prediction = model.predict(df_scaled)[0]
+        df_model = df[model_features]
+
+        # Scaling
+        scaled_array = scaler.transform(df_model)
+        df_scaled = pd.DataFrame(scaled_array, columns=model_features)
+
+        # Prediction
+        prediction = float(model.predict(df_scaled)[0])
 
         return jsonify({
             "input": data,
-            "prediction_cnt": float(prediction)
+            "prediction_cnt": prediction
         })
 
     except Exception as e:
         return jsonify({"error": str(e)})
 
-# ---------------------------
-# Run API locally
-# ---------------------------
 if __name__ == '__main__':
     app.run(debug=True)
