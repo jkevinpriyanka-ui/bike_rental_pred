@@ -6,11 +6,8 @@ import pandas as pd
 model = joblib.load("model/final_bike_model.pkl")  # stacked model
 scaler = joblib.load("model/scaler.pkl")           # scaler
 
-app = Flask(__name__)
+app = Flask(__name__, static_folder='static')
 
-@app.route('/')
-def home():
-    return {"message": "Bike Rental Prediction API is running"}
 
 @app.route('/')
 def homepage():
